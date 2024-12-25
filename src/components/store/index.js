@@ -1,4 +1,4 @@
-import { createStore } from 'vuex';
+const createStore = require('vuex');
 
 const store = createStore({
   state: {
