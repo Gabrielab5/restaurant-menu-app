@@ -1,7 +1,9 @@
-const { createApp } = require('vue');
-const App = require('./App.vue');
-const store = require('./components/store/index.js');
-require('./assets/css/main.css');
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import { createPinia } from 'pinia';
 
-createApp(App).use(store).mount('#app');
-
+const app = createApp(App);
+app.use(router);
+app.use(createPinia());
+app.mount('#app');

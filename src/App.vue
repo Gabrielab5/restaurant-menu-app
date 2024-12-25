@@ -4,43 +4,72 @@
     <p>{{ restaurant.description }}</p>
     <div v-for="category in menu" :key="category.category">
       <h2>{{ category.category }}</h2>
-      <div v-for="item in category.items" :key="item.title">
+      <div v-for="item in category.items" :key="item.title" class="menu-item">
         <h3>{{ item.title }}</h3>
         <p>{{ item.description }}</p>
         <p>Price: ${{ (item.price / 100).toFixed(2) }}</p>
         <p>Tags: {{ item.tags.join(', ') }}</p>
+        <button @click="addToCart(item)">Add to Cart</button>
       </div>
     </div>
+
+    <h2>Your Cart</h2>
+    <div v-for="item in cart" :key="item.title" class="cart-item">
+      <h3>{{ item.title }} (x{{ item.quantity }})</h3>
+      <p>Price: ${{ ((item.price * item.quantity) / 100).toFixed(2) }}</p>
+      <button @click="removeFromCart(item)">Remove</button>
+    </div>
+    <p>Total: ${{ (cartTotal / 100).toFixed(2) }}</p>
   </div>
 </template>
 
 <script>
+import { fetchMenuData } from './components/menuService';
+
 export default {
   data() {
     return {
       restaurant: {},
-      menu: []
+      menu: [],
+      cart: []
     };
-  },
-  created() {
-    this.fetchMenuData();
   },
   methods: {
     async fetchMenuData() {
       try {
-        const response = await fetch('/Alchemy_Menu.json');
-        const data = await response.json();
+        const data = await fetchMenuData();
         this.restaurant = data.restaurant;
         this.menu = data.menu;
       } catch (error) {
         console.error('Error fetching menu data:', error);
       }
+    },
+    addToCart(item) {
+      const cartItem = this.cart.find(cartItem => cartItem.title === item.title);
+      if (cartItem) {
+        cartItem.quantity++;
+      } else {
+        this.cart.push({ ...item, quantity: 1 });
+      }
+    },
+    removeFromCart(item) {
+      const cartIndex = this.cart.findIndex(cartItem => cartItem.title === item.title);
+      if (cartIndex !== -1) {
+        this.cart[cartIndex].quantity--;
+        if (this.cart[cartIndex].quantity === 0) {
+          this.cart.splice(cartIndex, 1);
+        }
+      }
     }
+  },
+  created() {
+    this.fetchMenuData();
   }
 };
 </script>
+
 <style scoped>
-  * {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -117,4 +146,12 @@ export default {
     border-radius: 5px;
     margin-right: 5px;
   }
+
+.cart-item {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 </style>
