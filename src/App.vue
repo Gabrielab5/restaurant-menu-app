@@ -1,26 +1,45 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1>{{ restaurant.name }}</h1>
+    <p>{{ restaurant.description }}</p>
+    <div v-for="category in menu" :key="category.category">
+      <h2>{{ category.category }}</h2>
+      <div v-for="item in category.items" :key="item.title">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+        <p>Price: ${{ (item.price / 100).toFixed(2) }}</p>
+        <p>Tags: {{ item.tags.join(', ') }}</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      restaurant: {},
+      menu: []
+    };
+  },
+  created() {
+    this.fetchMenuData();
+  },
+  methods: {
+    async fetchMenuData() {
+      try {
+        const response = await fetch('path_to_your_json_file/Alchemy_Menu.json');
+        const data = await response.json();
+        this.restaurant = data.restaurant;
+        this.menu = data.menu;
+      } catch (error) {
+        console.error('Error fetching menu data:', error);
+      }
+    }
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+/* Add your styles here */
 </style>
