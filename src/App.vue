@@ -28,7 +28,7 @@ export default {
   methods: {
     async fetchMenuData() {
       try {
-        const response = await fetch('path_to_your_json_file/Alchemy_Menu.json');
+        const response = await fetch('/Alchemy_Menu.json');
         const data = await response.json();
         this.restaurant = data.restaurant;
         this.menu = data.menu;
