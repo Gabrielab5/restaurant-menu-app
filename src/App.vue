@@ -15,19 +15,40 @@
       />
     </div>
 
+    <!-- Category Buttons for Navigation -->
+    <div class="category-buttons">
+      <button
+        v-for="category in menu"
+        :key="category.category"
+        @click="scrollToCategory(category.category)"
+        class="category-button"
+      >
+        {{ category.category }}
+      </button>
+    </div>
+
     <!-- Meal Suggestion Section -->
     <meal-suggestion
       v-if="showSuggestions"
-      :menu="filteredMenu"  
+      :menu="filteredMenu"
       @back-to-menu="toggleMenu"
     />
 
     <!-- Full Menu Section -->
     <div v-if="!showSuggestions" class="menu-container">
-      <div v-for="category in menu" :key="category.category" class="category-container">
+      <div
+        v-for="category in menu"
+        :key="category.category"
+        class="category-container"
+        :id="category.category" 
+      >
         <h2 class="category-title">{{ category.category }}</h2>
         <div class="menu-items">
-          <div v-for="item in category.items" :key="item.title + category.category" class="menu-item">
+          <div
+            v-for="item in category.items"
+            :key="item.title + category.category"
+            class="menu-item"
+          >
             <img :src="item.imageUrl" class="menu-item-image" />
             <div class="menu-item-details">
               <h3 class="menu-item-title">{{ item.title }}</h3>
@@ -72,9 +93,9 @@ export default {
       restaurant: {},
       menu: [],
       showCart: false,
-      showSuggestions: false,  // Controls whether the meal suggestion section is shown
-      preferences: "",  // Holds the user input for meal suggestion
-      filteredMenu: [],  // Holds the filtered meals based on the user input
+      showSuggestions: false,
+      preferences: "",
+      filteredMenu: [], // Holds the filtered meals based on the user input
     };
   },
   computed: {
@@ -105,9 +126,16 @@ export default {
       this.showSuggestions = !this.showSuggestions; // Toggle meal suggestion visibility
     },
 
+    scrollToCategory(category) {
+      const categoryElement = document.getElementById(category); // Scroll to the category
+      if (categoryElement) {
+        categoryElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+
     async suggestMeal() {
       const userQuery = this.preferences.trim().toLowerCase();
-      
+
       // If there's no input, reset the filtered menu to show all meals
       if (!userQuery) {
         this.filteredMenu = this.menu;
@@ -206,15 +234,50 @@ export default {
   color: #4c9a2a;
 }
 
-.category-container {
-  margin-bottom: 30px;
+/* Search Input */
+.search-container {
+  text-align: center;
+  margin-top: 20px;
 }
 
-.category-title {
-  font-size: 2rem;
-  color: #2d6a4f;
-  margin-bottom: 15px;
-  text-transform: uppercase;
+.suggestion-input {
+  padding: 10px;
+  font-size: 1rem;
+  width: 60%;
+  border-radius: 5px;
+  border: 1px solid #2d6a4f;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Category Buttons */
+.category-buttons {
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; 
+}
+
+.category-button {
+  background-color: #2d6a4f;
+  color: white;
+  padding: 5px 12px; 
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px; 
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.category-button:hover {
+  background-color: #218c4b;
+}
+
+/* Menu Section */
+.menu-container {
+  margin-top: 20px;
 }
 
 .menu-items {
@@ -224,7 +287,7 @@ export default {
 }
 
 .menu-item {
-  background-color: #fff;
+  background-color: white;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -284,21 +347,6 @@ export default {
 }
 
 /* Suggestion Section Styles */
-.search-container {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.suggestion-input {
-  padding: 10px;
-  font-size: 1rem;
-  width: 60%;
-  border-radius: 5px;
-  border: 1px solid #2d6a4f;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
 .suggested-items {
   margin-top: 20px;
 }
