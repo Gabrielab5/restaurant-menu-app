@@ -2,27 +2,28 @@
   <div class="cart">
     <button class="close-button" @click="$emit('closeCart')">X</button>
     <h2>Cart</h2>
-    
+
     <!-- Display each item in the cart -->
-    <div v-for="item in cart" :key="item.id + item.name" class="cart-item">
+    <div v-for="item in cart" :key="item.uniqueIdentifier" class="cart-item">
       <h4>{{ item.title }}</h4>
+      <p>{{ item.description }}</p>
       
       <div class="quantity-section">
         <!-- Quantity input for updating item quantity -->
         <input 
           type="number" 
           v-model.number="item.quantity" 
-          @change="updateQuantity(item.id, item.quantity)" 
+          @change="updateQuantity(item.uniqueIdentifier, item.quantity)" 
           min="1" 
         />
         <p class="item-price">Price: ${{ (item.price / 100).toFixed(2) }} each</p>
       </div>
-      
+
       <!-- Display total for this item -->
       <p class="total-price">Total for this item: ${{ ((item.price * item.quantity) / 100).toFixed(2) }}</p>
 
       <!-- Button to remove item from the cart -->
-      <button @click="removeFromCart(item.id)" class="remove-button">Remove</button>
+      <button @click="removeFromCart(item.uniqueIdentifier)" class="remove-button">Remove</button>
     </div>
 
     <!-- Display total price for all items in the cart -->
@@ -37,12 +38,12 @@ export default {
   setup() {
     const cartStore = useCartStore();
     
-    const removeFromCart = (itemId) => {
-      cartStore.removeFromCart(itemId);
+    const removeFromCart = (uniqueIdentifier) => {
+      cartStore.removeFromCart(uniqueIdentifier);
     };
 
-    const updateQuantity = (itemId, quantity) => {
-      cartStore.updateQuantity(itemId, quantity);
+    const updateQuantity = (uniqueIdentifier, quantity) => {
+      cartStore.updateQuantity(uniqueIdentifier, quantity);
     };
 
     return {

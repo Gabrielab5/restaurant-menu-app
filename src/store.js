@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    cart: [],
+    cart: [],  // This will store all the unique items in the cart
   }),
 
   actions: {
@@ -12,37 +12,39 @@ export const useCartStore = defineStore('cart', {
      * If it doesn't exist, it will add it as a new item with quantity 1.
      */
     addToCart(item) {
-      // Check if the item is already in the cart based on the id + name
+      // Use title + category as unique identifier to ensure each item is treated separately
+      const uniqueIdentifier = item.title + item.category;
       const existingItem = this.cart.find(
-        (cartItem) => cartItem.id === item.id && cartItem.name === item.name
+        (cartItem) => cartItem.uniqueIdentifier === uniqueIdentifier
       );
 
       if (existingItem) {
-        // Increase the quantity if it exists
+        // If it exists, increment the quantity
         existingItem.quantity++;
       } else {
-        // Add the new item if it doesn't exist yet
-        this.cart.push({ ...item, quantity: 1 });
+        // If it doesn't exist, add the item as a new entry with quantity 1
+        this.cart.push({ ...item, quantity: 1, uniqueIdentifier });
       }
     },
 
     /**
-     * Removes an item from the cart by its ID.
+     * Removes an item from the cart by its unique identifier.
      */
-    removeFromCart(itemId) {
-      this.cart = this.cart.filter((item) => item.id !== itemId);
+    removeFromCart(uniqueIdentifier) {
+      this.cart = this.cart.filter((item) => item.uniqueIdentifier !== uniqueIdentifier);
     },
 
     /**
      * Updates the quantity of an item in the cart.
      */
-    updateQuantity(itemId, quantity) {
-      const item = this.cart.find(cartItem => cartItem.id === itemId);
+    updateQuantity(uniqueIdentifier, quantity) {
+      const item = this.cart.find(cartItem => cartItem.uniqueIdentifier === uniqueIdentifier);
       if (item && quantity > 0) {
-        item.quantity = quantity;
+        item.quantity = quantity;  // Update the quantity of the item
       } else if (quantity <= 0) {
-        this.removeFromCart(itemId);  // Remove item if quantity is 0 or less
+        this.removeFromCart(uniqueIdentifier);  // Remove item if quantity is 0 or negative
       }
     },
   },
 });
+

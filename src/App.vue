@@ -11,13 +11,13 @@
         <h2 class="category-title">{{ category.category }}</h2>
         <div class="menu-items">
           <div v-for="item in category.items" :key="item.id" class="menu-item">
-            <img :src="item.imageUrl"  class="menu-item-image" />
+            <img :src="item.imageUrl" class="menu-item-image" />
             <div class="menu-item-details">
               <h3 class="menu-item-title">{{ item.title }}</h3>
               <p class="menu-item-description">{{ item.description }}</p>
               <p class="menu-item-price">Price: ${{ (item.price / 100).toFixed(2) }}</p>
               <p class="menu-item-tags">Tags: {{ item.tags.join(', ') }}</p>
-              <button @click="addToCart(item)" class="add-to-cart-button">Add to Cart</button>
+              <button @click="addToCart(item, category.category)" class="add-to-cart-button">Add to Cart</button>
             </div>
           </div>
         </div>
@@ -70,8 +70,9 @@ export default {
         this.menu = [];  // If the fetch fails, set menu to an empty array
       }
     },
-    addToCart(item) {
-      this.cartStore.addToCart(item); // Add item to the cart
+    addToCart(item, category) {
+      // Add the item to the cart with the category included as part of the unique identifier
+      this.cartStore.addToCart({ ...item, category });
     },
     toggleCart() {
       this.showCart = !this.showCart; // Toggle cart visibility
@@ -82,6 +83,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Add styles here */
+</style>
 
 <style scoped>
 
