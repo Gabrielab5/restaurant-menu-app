@@ -24,16 +24,48 @@
     name: "RestaurantMenu",
     setup() {
       const store = useCartStore();
-      const categories = computed(() => [...new Set(store.menu.map((item) => item.category))]);
-      const getItemsByCategory = (category) => store.menu.filter((item) => item.category === category);
-      const addToCart = (item) => store.addToCart(item);
-  
-      return { categories, getItemsByCategory, addToCart };
+      const categories = computed(() => {
+      const categorySet = new Set(store.menu.map((item) => item.category));
+      return Array.from(categorySet);
+    });
+
+    const menuByCategory = computed(() => {
+      return categories.value.reduce((acc, category) => {
+        acc[category] = store.menu.filter((item) => item.category === category);
+        return acc;
+      }, {});
+    });
+
+    const addToCart = (item) => {
+      store.addToCart(item);
+    };
+      return { categories, menuByCategory, addToCart };
     },
   };
   </script>
   
-  <style>
-  /* Add your styling here */
-  </style>
-  
+  <style scoped>
+.restaurant-menu {
+  padding: 20px;
+}
+.menu-category {
+  margin-bottom: 20px;
+}
+.menu-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.menu-item {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  width: 200px;
+}
+.menu-item-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+</style>

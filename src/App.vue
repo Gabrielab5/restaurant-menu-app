@@ -25,7 +25,7 @@
 
 <script>
 import ShoppingCart from "./components/ShoppingCart.vue";
-import { fetchMenuData } from './components/menuService';
+import { fetchMenuData } from './services/menuService';
 import { useCartStore } from './store';
 
 export default {

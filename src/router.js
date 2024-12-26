@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './views/HomePage.vue';
 import MealSuggestion from './components/MealSuggestion.vue';
+import ShoppingCart from './components/ShoppingCart.vue';
 
 const routes = [
   { path: '/', 
@@ -10,6 +11,8 @@ const routes = [
     name: 'MealSuggestion',
     component: MealSuggestion,
   },
+  { path: '/ShoppingCart', 
+    component: ShoppingCart },
 ];
 
 const router = createRouter({
