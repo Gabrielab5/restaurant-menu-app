@@ -1,62 +1,48 @@
 import { defineStore } from 'pinia';
-import { fetchMenuData } from './services/menuService.js';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
     cart: [],
-    menu: [],
   }),
+
   actions: {
-      /**
-         * Loads menu data into the state.
-         * @returns {Promise<void>} Resolves when the data is loaded.
-         */
-    async fetchMenu() {
-      try {
-        this.menu = await fetchMenuData();
-      } catch (error) {
-        console.error('Failed to fetch menu:', error);
-      }
-    },
     /**
-         * Adds an item to the cart.
-         * @param {Object} item - The item to add.
-         */
+     * Adds an item to the cart.
+     * If the item already exists, it will increment the quantity.
+     * If it doesn't exist, it will add it as a new item with quantity 1.
+     */
     addToCart(item) {
-      const existingItem = this.cart.find((cartItem) => cartItem.id === item.id);
+      // Check if the item is already in the cart based on the id + name
+      const existingItem = this.cart.find(
+        (cartItem) => cartItem.id === item.id && cartItem.name === item.name
+      );
+
       if (existingItem) {
+        // Increase the quantity if it exists
         existingItem.quantity++;
       } else {
+        // Add the new item if it doesn't exist yet
         this.cart.push({ ...item, quantity: 1 });
       }
     },
-     /**
-         * Removes an item from the cart.
-         * @param {number} itemId - The ID of the item to remove.
-         */
+
+    /**
+     * Removes an item from the cart by its ID.
+     */
     removeFromCart(itemId) {
       this.cart = this.cart.filter((item) => item.id !== itemId);
     },
+
     /**
-         * Adjusts the quantity of an item in the cart.
-         * @param {number} itemId - The ID of the item to adjust.
-         * @param {number} quantity - The new quantity.
-         */
-    adjustQuantity(itemId, quantity) {
-      const cartItem = this.cart.find((cartItem) => cartItem.id === itemId);
-      if (cartItem) {
-        if (quantity <= 0) {
-            this.removeFromCart(itemId);
-        } else {
-            cartItem.quantity = quantity;
-        }
-      }
-    },
-     /**
-     * Clears the cart.
+     * Updates the quantity of an item in the cart.
      */
-    clearCart() {
-      this.cart = [];
+    updateQuantity(itemId, quantity) {
+      const item = this.cart.find(cartItem => cartItem.id === itemId);
+      if (item && quantity > 0) {
+        item.quantity = quantity;
+      } else if (quantity <= 0) {
+        this.removeFromCart(itemId);  // Remove item if quantity is 0 or less
+      }
     },
   },
 });

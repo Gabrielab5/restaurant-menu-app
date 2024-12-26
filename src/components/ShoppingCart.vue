@@ -2,20 +2,30 @@
   <div class="cart">
     <button class="close-button" @click="$emit('closeCart')">X</button>
     <h2>Cart</h2>
-    <div v-for="item in cart" :key="item.id" class="cart-item">
+    
+    <!-- Display each item in the cart -->
+    <div v-for="item in cart" :key="item.id + item.name" class="cart-item">
       <h4>{{ item.title }}</h4>
+      
       <div class="quantity-section">
+        <!-- Quantity input for updating item quantity -->
         <input 
           type="number" 
           v-model.number="item.quantity" 
           @change="updateQuantity(item.id, item.quantity)" 
-          min="1"
+          min="1" 
         />
-        <p>Price: ${{ (item.price / 100).toFixed(2) }} each</p>
+        <p class="item-price">Price: ${{ (item.price / 100).toFixed(2) }} each</p>
       </div>
-      <p>Total for this item: ${{ ((item.price * item.quantity) / 100).toFixed(2) }}</p>
-      <button @click="removeFromCart(item.id)">Remove</button>
+      
+      <!-- Display total for this item -->
+      <p class="total-price">Total for this item: ${{ ((item.price * item.quantity) / 100).toFixed(2) }}</p>
+
+      <!-- Button to remove item from the cart -->
+      <button @click="removeFromCart(item.id)" class="remove-button">Remove</button>
     </div>
+
+    <!-- Display total price for all items in the cart -->
     <p class="total-price">Total Price: ${{ totalPrice.toFixed(2) }} USD</p>
   </div>
 </template>
@@ -28,7 +38,7 @@ export default {
     const cartStore = useCartStore();
     
     const removeFromCart = (itemId) => {
-      cartStore.removeFromCart(itemId); 
+      cartStore.removeFromCart(itemId);
     };
 
     const updateQuantity = (itemId, quantity) => {
@@ -42,9 +52,11 @@ export default {
     };
   },
   computed: {
+    // Return the cart items from the store
     cart() {
-      return this.cartStore.cart || [] ; // Accessing the cart from the store
+      return this.cartStore.cart || [];
     },
+    // Calculate total price for all items in the cart
     totalPrice() {
       return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0) / 100;
     },
@@ -98,10 +110,30 @@ export default {
   text-align: center;
 }
 
+.item-price {
+  font-size: 1rem;
+  color: #2d6a4f; /* Deep green */
+}
+
 .total-price {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #e75e2a;
-  margin-top: 20px;
+  color: #2d6a4f;
+  margin-top: 10px;
+}
+
+.remove-button {
+  background-color: #e75e2a; /* Red for removing items */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+  background-color: #d65c2f; /* Darker red for hover effect */
 }
 </style>
