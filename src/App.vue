@@ -34,9 +34,7 @@ export default {
   },
   setup() {
     const cartStore = useCartStore(); 
-    return {
-      cartStore, 
-    };
+    return { cartStore };
   },
   data() {
     return {
@@ -48,7 +46,7 @@ export default {
   },
   computed: {
     cartItemCount() {
-      return this.cartStore.reduce((total, item) => total + item.quantity, 0);
+      return this.cartStore.cart.reduce((total, item) => total + item.quantity, 0);
     },
   },
   methods: {
