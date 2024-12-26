@@ -1,5 +1,6 @@
 <template>
   <div class="cart">
+    <button class="close-button" @click="$emit('closeCart')">X</button>
     <h2>Cart</h2>
     <div v-for="item in cart" :key="item.id" class="cart-item">
       <h4>{{ item.title }}</h4>
@@ -12,19 +13,44 @@
 
 <script>
 import { useCartStore } from "../store";
-import { computed } from 'vue'; 
-export default {
-  name: "ShoppingCart",
-  setup() {
-    const store = useCartStore();
-    const cart = computed(() => store.cart);
-    const totalPrice = computed(() =>
-      store.cart.reduce((total, item) => total + item.quantity * item.price, 0) / 100
-    );
-    const removeFromCart = (itemId) => store.removeFromCart(itemId);
-    const updateQuantity = (itemId, quantity) => store.adjustQuantity(itemId, quantity);
 
-    return { cart, totalPrice, removeFromCart, updateQuantity };
+export default {
+  setup() {
+    const cartStore = useCartStore();
+    return {
+      cartStore, 
+    };
+  },
+  methods: {
+    closeCart() {
+      this.$emit('closeCart'); 
+    },
+    removeFromCart(itemId) {
+      this.cartStore.removeFromCart(itemId); 
+    },
   },
 };
 </script>
+
+<style scoped>
+.cart {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+</style>

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <div class="main-container">
+      <div class="menu-container"></div>
     <h1>{{ restaurant.name }}</h1>
     <p>{{ restaurant.description }}</p>
     <div v-for="category in menu" :key="category.category">
@@ -12,27 +14,42 @@
         <button @click="addToCart(item)">Add to Cart</button>
       </div>
     </div>
-
-    <h2>Your Cart</h2>
-    <div v-for="item in cart" :key="item.title" class="cart-item">
-      <h3>{{ item.title }} (x{{ item.quantity }})</h3>
-      <p>Price: ${{ ((item.price * item.quantity) / 100).toFixed(2) }}</p>
-      <button @click="removeFromCart(item)">Remove</button>
+</div>
+    <div id="cart-icon" @click="toggleCart">
+      🛒 ({{ cartItemCount }})
     </div>
-    <p>Total: ${{ (cartTotal / 100).toFixed(2) }}</p>
+
+     <ShoppingCart v-if="showCart" :cart="cart" @closeCart="toggleCart" />
   </div>
 </template>
 
 <script>
+import ShoppingCart from "./components/ShoppingCart.vue";
 import { fetchMenuData } from './components/menuService';
+import { useCartStore } from './store';
 
 export default {
+  components: {
+    ShoppingCart,
+  },
+  setup() {
+    const cartStore = useCartStore(); 
+    return {
+      cartStore, 
+    };
+  },
   data() {
     return {
       restaurant: {},
       menu: [],
-      cart: []
+      //cart: []
+      showCart: false,
     };
+  },
+  computed: {
+    cartItemCount() {
+      return this.cartStore.reduce((total, item) => total + item.quantity, 0);
+    },
   },
   methods: {
     async fetchMenuData() {
@@ -45,30 +62,38 @@ export default {
       }
     },
     addToCart(item) {
-      const cartItem = this.cart.find(cartItem => cartItem.title === item.title);
-      if (cartItem) {
-        cartItem.quantity++;
-      } else {
-        this.cart.push({ ...item, quantity: 1 });
-      }
+      this.cartStore.addToCart(item);
     },
-    removeFromCart(item) {
-      const cartIndex = this.cart.findIndex(cartItem => cartItem.title === item.title);
-      if (cartIndex !== -1) {
-        this.cart[cartIndex].quantity--;
-        if (this.cart[cartIndex].quantity === 0) {
-          this.cart.splice(cartIndex, 1);
-        }
-      }
-    }
+    toggleCart(){
+      this.showCart = !this.showCart;
+    },
   },
   created() {
     this.fetchMenuData();
-  }
+  },
 };
 </script>
 
 <style scoped>
+#cart-icon {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background-color: #f4f4f9;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 * {
     margin: 0;
     padding: 0;
