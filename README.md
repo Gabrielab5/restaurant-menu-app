@@ -1,4 +1,5 @@
 Restaurant Menu Application
+
 This project is a single-page web application built with Vue.js for the frontend, Tailwind CSS for styling, and Pinia for state management. The application displays a restaurant menu, allows users to add or remove items from a cart, and suggests meals based on user preferences through integration with the OpenAI API.
 
 Features
