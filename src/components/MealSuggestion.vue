@@ -13,13 +13,14 @@
     </div>
 
     <!-- Display filtered meal suggestions -->
-    <div v-if="suggestedItems.length" class="suggested-items">
+    <div v-if="suggestedItems.length > 0" class="suggested-items">
       <h2>Suggested Items:</h2>
       <div v-for="item in suggestedItems" :key="item.id" class="item-card">
         <h3>{{ item.title }}</h3>
         <p>{{ item.description }}</p>
         <p>Price: ${{ (item.price / 100).toFixed(2) }}</p>
-        <p>Tags: {{ item.tags.join(', ') }}</p>
+        <p>Tags: {{ item.tags ? item.tags.join(', ') : 'No tags available' }}</p>
+        <button @click="addToCart(item)">Add to Cart</button>
       </div>
     </div>
 
@@ -28,14 +29,10 @@
       <p>No items match your preferences. Try different keywords.</p>
     </div>
 
-    <!-- Back to Menu Button -->
-    <button @click="goBackToMenu" class="back-button">Back to Menu</button>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   props: {
     menu: Array,  // Receives the menu array from parent
@@ -47,58 +44,23 @@ export default {
     };
   },
   methods: {
-    async suggestMeal() {
+    suggestMeal() {
       const userQuery = this.preferences.trim();
 
       // If there's no input, reset the suggested meals to show all
       if (!userQuery) {
-        this.suggestedItems = this.menu;
+        this.suggestedItems = this.menu.flatMap(category => category.items);
         return;
       }
 
-      const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
-
-      // Constructing a specific prompt for meal suggestions based on user preferences
-      const prompt = `
-        Suggest meals based on the following preferences: 
-        ${userQuery}
-        Please return meal names, their descriptions, and tags. Only suggest meals that match these preferences.
-      `;
-
-      try {
-        const response = await axios.post(
-          'https://api.openai.com/v1/completions',
-          {
-            model: 'text-davinci-003',
-            prompt: prompt,
-            max_tokens: 200,
-            temperature: 0.7,
-            n: 1,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-            },
-          }
-        );
-
-        const mealSuggestions = response.data.choices[0].text
-          .split('\n')
-          .map(item => item.trim())
-          .filter(Boolean); // Clean empty lines
-
-        // Filtering the menu to match the meal suggestions (by title)
-        this.suggestedItems = this.menu.filter(item => {
-          return mealSuggestions.some(meal => item.title.toLowerCase().includes(meal.toLowerCase()));
+      this.suggestedItems = this.menu.flatMap(category => {
+        return category.items.filter(item => {
+          return item.title && item.title.toLowerCase().includes(userQuery.toLowerCase());
         });
-      } catch (error) {
-        console.error('Error fetching meal suggestions:', error);
-      }
+      });
     },
-
-    goBackToMenu() {
-      // Emit an event to the parent component to switch back to the full menu
-      this.$emit('back-to-menu');
+    addToCart(item) {
+      this.$emit('add-to-cart', item); // Emit the item to add it to the cart
     },
   },
 };
@@ -107,8 +69,15 @@ export default {
 <style scoped>
 .meal-suggestion {
   padding: 20px;
-  background-color: #f7f7f7;
+  background-color: #eafaf0; /* Light green background */
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the content */
+  justify-content: center;
+  min-height: 100vh;
+  max-width: 600px; /* Limit the width */
+  margin: 0 auto; /* Center horizontally */
 }
 
 .input-section {
@@ -116,16 +85,17 @@ export default {
 }
 
 .suggestion-input {
-  padding: 10px;
+  padding: 12px;
   font-size: 1rem;
-  width: 80%;
+  width: 80%; 
+  max-width: 1000px; 
   border-radius: 5px;
   border: 1px solid #2d6a4f;
-  margin-top: 10px;
 }
 
 .suggested-items {
   margin-top: 20px;
+  width: 100%;
 }
 
 .item-card {

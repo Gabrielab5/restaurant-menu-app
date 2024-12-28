@@ -71,7 +71,7 @@ Technologies Used
 Vue.js: Framework for building the app's UI.
 Tailwind CSS: Utility-first CSS framework for styling.
 Pinia: State management solution for Vue.js.
-OpenAI API: Used to generate meal suggestions based on user preferences.
+Hugging Face API: Used to generate meal suggestions based on user preferences.
 Axios: HTTP client to interact with APIs.
 
 License

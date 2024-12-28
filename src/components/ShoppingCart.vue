@@ -1,5 +1,6 @@
 <template>
   <div class="cart">
+  
     <button class="close-button" @click="$emit('closeCart')">X</button>
     <h2>Cart</h2>
 

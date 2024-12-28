@@ -5,16 +5,6 @@
       <p class="restaurant-description">{{ restaurant.description }}</p>
     </div>
 
-    <!-- Search bar for meal suggestions -->
-    <div class="search-container">
-      <input
-        v-model="preferences"
-        @input="suggestMeal" 
-        placeholder="Enter your preferences (e.g., spicy, vegan)"
-        class="suggestion-input"
-      />
-    </div>
-
     <!-- Category Buttons for Navigation -->
     <div class="category-buttons">
       <button
@@ -28,14 +18,18 @@
     </div>
 
     <!-- Meal Suggestion Section -->
-    <meal-suggestion
-      v-if="showSuggestions"
-      :menu="filteredMenu"
-      @back-to-menu="toggleMenu"
-    />
+    <div class="meal-suggestion-section">
+      <meal-suggestion
+        ref="mealSuggestion" 
+        v-if="filteredMenu.length > 0" 
+        :menu="filteredMenu"
+        @add-to-cart="addToCart"
+        @back-to-menu="toggleMenu"
+      />
+    </div>
 
     <!-- Full Menu Section -->
-    <div v-if="!showSuggestions" class="menu-container">
+    <div class="menu-container">
       <div
         v-for="category in menu"
         :key="category.category"
@@ -76,8 +70,7 @@
 import MealSuggestion from './components/MealSuggestion.vue';
 import { useCartStore } from './store';
 import ShoppingCart from './components/ShoppingCart.vue';
-import { fetchMenuData } from './services/menuService';  // Import the fetchMenuData function
-import axios from 'axios';
+import { fetchMenuData } from './services/menuService';
 
 export default {
   components: {
@@ -93,7 +86,6 @@ export default {
       restaurant: {},
       menu: [],
       showCart: false,
-      showSuggestions: false,
       preferences: "",
       filteredMenu: [], // Holds the filtered meals based on the user input
     };
@@ -106,7 +98,7 @@ export default {
   methods: {
     async fetchMenuData() {
       try {
-        const data = await fetchMenuData(); // Fetch menu data
+        const data = await fetchMenuData();
         this.restaurant = data.restaurant;
         this.menu = data.menu;
         this.filteredMenu = this.menu; // Initially show all items
@@ -121,72 +113,15 @@ export default {
     toggleCart() {
       this.showCart = !this.showCart; // Toggle cart visibility
     },
-
     toggleMenu() {
       this.showSuggestions = !this.showSuggestions; // Toggle meal suggestion visibility
     },
-
     scrollToCategory(category) {
-      const categoryElement = document.getElementById(category); // Scroll to the category
+      const categoryElement = document.getElementById(category);
       if (categoryElement) {
         categoryElement.scrollIntoView({ behavior: 'smooth' });
       }
     },
-
-    async suggestMeal() {
-      const userQuery = this.preferences.trim().toLowerCase();
-
-      // If there's no input, reset the filtered menu to show all meals
-      if (!userQuery) {
-        this.filteredMenu = this.menu;
-        return;
-      }
-
-      // API key for OpenAI
-      const apiKey = process.env.VUE_APP_OPENAI_API_KEY;
-
-      // Construct the prompt to pass to OpenAI for filtering suggestions
-      const prompt = `
-        Suggest meals based on the following preferences: 
-        ${userQuery}
-        Please return meal names, their descriptions, and tags. Only suggest meals that match these preferences.
-      `;
-
-      try {
-        const response = await axios.post(
-          'https://api.openai.com/v1/completions',
-          {
-            model: 'text-davinci-003',
-            prompt: prompt,
-            max_tokens: 200,
-            temperature: 0.7,
-            n: 1,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-            },
-          }
-        );
-
-        const mealSuggestions = response.data.choices[0].text
-          .split('\n')
-          .map(item => item.trim())
-          .filter(Boolean); // Clean empty lines
-
-        // Filtering the menu to match the meal suggestions (by title)
-        this.filteredMenu = this.menu.map(category => {
-          const filteredItems = category.items.filter(item => {
-            return mealSuggestions.some(meal => item.title.toLowerCase().includes(meal.toLowerCase()));
-          });
-
-          return { ...category, items: filteredItems };
-        }).filter(category => category.items.length > 0); // Remove empty categories
-
-      } catch (error) {
-        console.error('Error fetching meal suggestions:', error);
-      }
-    }
   },
   created() {
     this.fetchMenuData(); // Fetch the menu when the component is created
@@ -235,20 +170,7 @@ export default {
 }
 
 /* Search Input */
-.search-container {
-  text-align: center;
-  margin-top: 20px;
-}
 
-.suggestion-input {
-  padding: 10px;
-  font-size: 1rem;
-  width: 60%;
-  border-radius: 5px;
-  border: 1px solid #2d6a4f;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
 
 /* Category Buttons */
 .category-buttons {
@@ -344,37 +266,5 @@ export default {
 
 .add-to-cart-button:hover {
   background-color: #388e3c; /* Darker green */
-}
-
-/* Suggestion Section Styles */
-.suggested-items {
-  margin-top: 20px;
-}
-
-.suggested-items .menu-item {
-  background-color: #ffffff;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.no-results {
-  font-size: 1.2rem;
-  color: #e75e2a;
-}
-
-.back-button {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #4c9a2a;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.back-button:hover {
-  background-color: #388e3c;
 }
 </style>

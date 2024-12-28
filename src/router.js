@@ -11,9 +11,13 @@ const routes = [
     name: 'MealSuggestion',
     component: MealSuggestion,
   },
-  { path: '/ShoppingCart', 
-    component: ShoppingCart },
+  {
+    path: '/shopping-cart',
+    name: 'ShoppingCart',
+    component: ShoppingCart,
+  },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(),
