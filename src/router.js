@@ -1,23 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from './views/HomePage.vue';
-import MealSuggestion from './components/MealSuggestion.vue';
+import App from './App.vue';
 import ShoppingCart from './components/ShoppingCart.vue';
 
 const routes = [
-  { path: '/', 
-    component: HomePage },
   {
-    path: '/meal-suggestion',
-    name: 'MealSuggestion',
-    component: MealSuggestion,
+    path: '/Alchemy-Restaurant',  // Main route
+    name: 'Alchemy-Restaurant',
+    component: App, // The main route now points to App.vue
   },
   {
-    path: '/shopping-cart',
-    name: 'ShoppingCart',
-    component: ShoppingCart,
+    path: '/Alchemy-Restaurant/shopping-cart',
+    name: '/Alchemy-Restaurant/ShoppingCart',
+    component: ShoppingCart, // Route for the cart
   },
 ];
-
 
 const router = createRouter({
   history: createWebHistory(),

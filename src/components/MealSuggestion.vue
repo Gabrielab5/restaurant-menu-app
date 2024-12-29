@@ -88,8 +88,8 @@ export default {
   padding: 12px;
   font-size: 1rem;
   width: 80%; 
-  max-width: 1000px; 
-  border-radius: 5px;
+  max-width: 2000px; 
+  border-radius: 10px;
   border: 1px solid #2d6a4f;
 }
 
@@ -111,17 +111,5 @@ export default {
   color: #e75e2a;
 }
 
-.back-button {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #4c9a2a;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
-.back-button:hover {
-  background-color: #388e3c;
-}
 </style>

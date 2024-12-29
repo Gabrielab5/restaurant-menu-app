@@ -1,5 +1,7 @@
 <template>
   <div class="app">
+    <router-link to="/App">
+    </router-link>
     <div class="header">
       <h1>{{ restaurant.name }}</h1>
       <p class="restaurant-description">{{ restaurant.description }}</p>
@@ -24,7 +26,7 @@
         v-if="filteredMenu.length > 0" 
         :menu="filteredMenu"
         @add-to-cart="addToCart"
-        @back-to-menu="toggleMenu"
+      
       />
     </div>
 
@@ -57,9 +59,11 @@
     </div>
 
     <!-- Cart Icon -->
+    <router-link to="/Alchemy-Restaurant/shopping-cart">
     <div id="cart-icon" @click="toggleCart" class="cart-icon">
       🛒 ({{ cartItemCount }})
     </div>
+  </router-link>
 
     <!-- Shopping Cart -->
     <ShoppingCart v-if="showCart" :cart="cartStore.cart" @closeCart="toggleCart" />
@@ -107,11 +111,30 @@ export default {
         this.menu = [];  // If the fetch fails, set menu to an empty array
       }
     },
+
+
+     // When input is changed, it triggers suggestMeal function
+     async suggestMeal() {
+      const userQuery = this.preferences.trim();
+      if (!userQuery) {
+        this.filteredMenu = this.menu;
+        return;
+      }
+
+      // Call the suggestMeal function of MealSuggestion using the correct reference
+      await this.$refs.mealSuggestion.suggestMeal(userQuery);
+    },
+
+    
     addToCart(item) {
       this.cartStore.addToCart(item); // Add item to the cart
     },
     toggleCart() {
       this.showCart = !this.showCart; // Toggle cart visibility
+     // if (this.showCart) {
+     // window.history.replaceState(null, '', '/');
+    
+
     },
     toggleMenu() {
       this.showSuggestions = !this.showSuggestions; // Toggle meal suggestion visibility
@@ -168,9 +191,6 @@ export default {
   font-size: 1.2rem;
   color: #4c9a2a;
 }
-
-/* Search Input */
-
 
 /* Category Buttons */
 .category-buttons {
@@ -252,6 +272,7 @@ export default {
   color: #7a9a46; /* Muted green for tags */
   margin-bottom: 15px;
 }
+
 
 .add-to-cart-button {
   background-color: #4c9a2a; /* Light green */

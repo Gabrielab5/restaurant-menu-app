@@ -1,7 +1,9 @@
 <template>
   <div class="cart">
-  
+    
+    <router-link to="/Alchemy-Restaurant">
     <button class="close-button" @click="$emit('closeCart')">X</button>
+    </router-link>
     <h2>Cart</h2>
 
     <!-- Display each item in the cart -->
