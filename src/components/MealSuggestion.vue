@@ -45,20 +45,25 @@ export default {
   },
   methods: {
     suggestMeal() {
-      const userQuery = this.preferences.trim();
+  const userQuery = this.preferences.trim().toLowerCase();
 
-      // If there's no input, reset the suggested meals to show all
-      if (!userQuery) {
-        this.suggestedItems = this.menu.flatMap(category => category.items);
-        return;
-      }
+  if (!userQuery) {
+    this.suggestedItems = this.menu.flatMap(category => category.items);
+    return;
+  }
 
-      this.suggestedItems = this.menu.flatMap(category => {
-        return category.items.filter(item => {
-          return item.title && item.title.toLowerCase().includes(userQuery.toLowerCase());
-        });
-      });
-    },
+  const searchTerms = userQuery.split(' ').filter(term => term);
+  this.suggestedItems = this.menu.flatMap(category =>
+    category.items.filter(item => {
+      const searchableText = [
+        item.title,
+        item.description,
+        ...(item.tags || []) 
+      ].join(' ').toLowerCase();
+      return searchTerms.every(term => searchableText.includes(term));
+    })
+  );
+},
     addToCart(item) {
       this.$emit('add-to-cart', item); // Emit the item to add it to the cart
     },
