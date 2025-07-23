@@ -30,33 +30,34 @@
       />
     </div>
 
-    <!-- Full Menu Section -->
-    <div class="menu-container">
-      <div
-        v-for="category in menu"
-        :key="category.category"
-        class="category-container"
-        :id="category.category" 
-      >
-        <h2 class="category-title">{{ category.category }}</h2>
-        <div class="menu-items">
-          <div
-            v-for="item in category.items"
-            :key="item.title + category.category"
-            class="menu-item"
-          >
-            <img :src="item.imageUrl" class="menu-item-image" />
-            <div class="menu-item-details">
-              <h3 class="menu-item-title">{{ item.title }}</h3>
-              <p class="menu-item-description">{{ item.description }}</p>
-              <p class="menu-item-price">Price: ${{ (item.price / 100).toFixed(2) }}</p>
-              <p class="menu-item-tags" :style="{ color: '#2d6a4f' }">Tags: {{ item.tags.join(', ') }}</p>
-              <button @click="addToCart(item)" class="add-to-cart-button">Add to Cart</button>
-            </div>
-          </div>
-        </div>
+   <div class="menu-container">
+  <div class="menu-items">
+    <div
+      v-for="item in paginatedItems"
+      :key="item.title"
+      class="menu-item"
+    >
+      <img :src="item.imageUrl" class="menu-item-image" />
+      <div class="menu-item-details">
+        <h3 class="menu-item-title">{{ item.title }}</h3>
+        <p class="menu-item-description">{{ item.description }}</p>
+        <p class="menu-item-price">Price: ${{ (item.price / 100).toFixed(2) }}</p>
+        <p class="menu-item-tags" :style="{ color: '#2d6a4f' }">Tags: {{ item.tags.join(', ') }}</p>
+        <button @click="addToCart(item)" class="add-to-cart-button">Add to Cart</button>
       </div>
     </div>
+  </div>
+
+  <div class="pagination-controls">
+    <button @click="prevPage" :disabled="currentPage === 1" class="pagination-button">
+      Previous
+    </button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-button">
+      Next
+    </button>
+  </div>
+</div>
 
     <!-- Cart Icon -->
     <router-link to="/Alchemy-Restaurant/shopping-cart">
@@ -91,12 +92,27 @@ export default {
       menu: [],
       showCart: false,
       preferences: "",
-      filteredMenu: [], // Holds the filtered meals based on the user input
+      filteredMenu: [], 
+      currentPage: 1,   
+      itemsPerPage: 9,
     };
   },
   computed: {
     cartItemCount() {
       return this.cartStore.cart.reduce((total, item) => total + item.quantity, 0);
+    },
+    allItems() {
+      return this.menu.flatMap(category => category.items);
+    },
+
+    totalPages() {
+      return Math.ceil(this.allItems.length / this.itemsPerPage);
+    },
+
+    paginatedItems() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.allItems.slice(start, end);
     },
   },
   methods: {
@@ -124,21 +140,33 @@ export default {
       // Call the suggestMeal function of MealSuggestion using the correct reference
       await this.$refs.mealSuggestion.suggestMeal(userQuery);
     },
-
+    
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }  
+    },
     
     addToCart(item) {
       this.cartStore.addToCart(item); // Add item to the cart
     },
+    
     toggleCart() {
       this.showCart = !this.showCart; // Toggle cart visibility
      // if (this.showCart) {
      // window.history.replaceState(null, '', '/');
+     },
     
-
-    },
     toggleMenu() {
       this.showSuggestions = !this.showSuggestions; // Toggle meal suggestion visibility
     },
+    
     scrollToCategory(category) {
       const categoryElement = document.getElementById(category);
       if (categoryElement) {
